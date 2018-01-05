@@ -2,19 +2,14 @@ var Client = require('castv2-client').Client;
 var DefaultMediaReceiver = require('castv2-client').DefaultMediaReceiver;
 var googletts = require('google-tts-api');
 
-function GoogleHomeNotifier(deviceAddresses, language) {
-  this.deviceAddresses = deviceAddresses;
-  this.language = language;
-}
-
-GoogleHomeNotifier.prototype.notify = function(message, callback) {
-  getSpeechUrl(message, this.deviceAddresses, this.language, function(res) {
+var notify = function(message, hosts, language, callback) {
+  getSpeechUrl(message, hosts, language, function(res) {
     callback(res);
   });
-};
+}
 
-GoogleHomeNotifier.prototype.play = function(mp3_url, callback) {
-  getPlayUrl(mp3_url, this.deviceAddresses, function(res) {
+var play = function(mp3_url, hosts, callback) {
+  getPlayUrl(mp3_url, hosts, function(res) {
     callback(res);
   });
 };
@@ -63,4 +58,5 @@ var onDeviceUp = function(host, url, callback) {
   });
 };
 
-module.exports = GoogleHomeNotifier;
+exports.play = play;
+exports.notify = notify;
