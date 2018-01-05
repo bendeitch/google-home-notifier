@@ -32,12 +32,16 @@ app.post('/google-home-notifier', urlencodedParser, function (req, res) {
       if (text.startsWith('http')){
         var mp3_url = text;
         googlehome.play(mp3_url, getAddresses(), function(notifyRes) {
-          console.log(notifyRes);
+          if (notifyRes != 'OK') {
+            console.log(notifyRes);
+          }
         });
 	res.sendStatus(200);
       } else {
         googlehome.notify(text, getAddresses(), language, function(notifyRes) {
-          console.log(notifyRes);
+          if (notifyRes != 'OK') {
+            console.log(notifyRes);
+          }
         });
 	res.sendStatus(200);
       }
