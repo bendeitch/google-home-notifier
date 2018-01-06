@@ -47,26 +47,36 @@ var onDeviceUp = function(host, url, callback) {
   client.connect(host, function() {
     client.launch(DefaultMediaReceiver, function(err, player) {
 
-      var media = {
-        contentId: url,
-        contentType: 'audio/mp3',
-        streamType: 'BUFFERED'
-      };
+      if (err) {
 
-      player.load(media, { autoplay: true }, function(err, status) {
-        if (err != null) {
-          client.close();
-          callback(err);
-        }
-      });
+        console.log('Error: %s', err.message);
+        client.close();
+        callback(err);
 
-      player.on('status', function(status) {
-        if (status.playerState == 'IDLE' && status.idleReason == 'FINISHED') {
-          client.close();
-          callback('OK');
-        }
-      });
-    });
+      } else if (player) {
+
+        var media = {
+          contentId: url,
+          contentType: 'audio/mp3',
+          streamType: 'BUFFERED'
+        };
+
+        player.load(media, { autoplay: true }, function(err, status) {
+          if (err != null) {
+            client.close();
+            callback(err);
+          }
+        });
+
+        player.on('status', function(status) {
+          if (status.playerState == 'IDLE' && status.idleReason == 'FINISHED') {
+            client.close();
+            callback('OK');
+          }
+        });
+      }
+  
+  });
   });
 
   client.on('error', function(err) {
