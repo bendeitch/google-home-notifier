@@ -47,13 +47,7 @@ var onDeviceUp = function(host, url, callback) {
   client.connect(host, function() {
     client.launch(DefaultMediaReceiver, function(err, player) {
 
-      if (err) {
-
-        console.log('Error: %s', err.message);
-        client.close();
-        callback(err);
-
-      } else if (player) {
+      if (player) {
 
         var media = {
           contentId: url,
@@ -75,8 +69,7 @@ var onDeviceUp = function(host, url, callback) {
           }
         });
       }
-  
-  });
+    });
   });
 
   client.on('error', function(err) {
