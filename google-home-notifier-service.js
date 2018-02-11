@@ -15,43 +15,73 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 googlehomefinder.start();
 
-var getAddresses = function() {
+var getAllAddresses = function() {
   var addresses = googlehomefinder.addresses;
   return devices.map( name => addresses[name] );
 }
 
-app.post('/google-home-notifier', urlencodedParser, function (req, res) {
-  
+var getAddress = function(deviceName) {
+  return [googlehomefinder.addresses[deviceName]];
+}
+
+var processText = function(text, deviceAddresses) {
+
+  if (text.startsWith('http')){
+    var mp3_url = text;
+    googlehome.play(mp3_url, deviceAddresses, function(notifyRes) {
+      if (notifyRes != 'OK') {
+        console.log(notifyRes);
+      }
+    });
+
+  } else {
+
+    googlehome.notify(text, deviceAddresses, language, function(notifyRes) {
+      if (notifyRes != 'OK') {
+        console.log(notifyRes);
+      }
+    });
+
+  }
+}
+
+var processRequest = function(req, res, deviceName) {
+
   if (!req.body) return res.sendStatus(400)
   console.log(req.body);
   
   var text = req.body.text;
 
   if (text){
+
     try {
-      if (text.startsWith('http')){
-        var mp3_url = text;
-        googlehome.play(mp3_url, getAddresses(), function(notifyRes) {
-          if (notifyRes != 'OK') {
-            console.log(notifyRes);
-          }
-        });
-	res.sendStatus(200);
+
+      if (deviceName) {
+        processText(text, getAddress(deviceName));
       } else {
-        googlehome.notify(text, getAddresses(), language, function(notifyRes) {
-          if (notifyRes != 'OK') {
-            console.log(notifyRes);
-          }
-        });
-	res.sendStatus(200);
+        processText(text, getAllAddresses());
       }
+      res.sendStatus(200);
+
     } catch(err) {
+
       console.log(err);
-      res.sendStatus(500);
+      res.status(500).send(err);
+
     }
+
   } else {
-    res.send('Missing text parameter');
+
+    res.status(500).send('Missing text parameter');
   }
+}
+
+app.post('/google-home-notifier/:deviceName', urlencodedParser, function (req, res) {
+  processRequest(req, res, req.params.deviceName);
+})
+
+app.post('/google-home-notifier', urlencodedParser, function (req, res) {
+  processRequest(req, res, null);
 })
 
 app.listen(serverPort);
