@@ -2,16 +2,20 @@ var Client = require('castv2-client').Client;
 var DefaultMediaReceiver = require('castv2-client').DefaultMediaReceiver;
 var googletts = require('google-tts-api');
 var queue = require('queue');
-
+var lastMessageQueued = '';
 var q = queue({concurrency: 1, autostart: true});
 
 var notify = function(message, hosts, language, callback) {
-  q.push(function(finished) {
-    getSpeechUrl(message, hosts, language, function(res) {
-      finished();
-      callback(res);
+
+  if (q.length == 0 || message != lastMessageQueued) {  
+    q.push(function(finished) {
+      getSpeechUrl(message, hosts, language, function(res) {
+        finished();
+        callback(res);
+      });
     });
-  });
+    lastMessageQueued = message;
+  }
 }
 
 var play = function(mp3_url, hosts, callback) {
@@ -43,8 +47,10 @@ var getPlayUrl = function(url, hosts, callback) {
 };
 
 var onDeviceUp = function(host, url, callback) {
+
   var client = new Client();
   client.connect(host, function() {
+
     client.launch(DefaultMediaReceiver, function(err, player) {
 
       if (player) {
@@ -52,7 +58,7 @@ var onDeviceUp = function(host, url, callback) {
         var media = {
           contentId: url,
           contentType: 'audio/mp3',
-          streamType: 'BUFFERED'
+          streamType: 'LIVE'
         };
 
         player.load(media, { autoplay: true }, function(err, status) {
@@ -69,8 +75,8 @@ var onDeviceUp = function(host, url, callback) {
           }
         });
       }
-    });
-  });
+  });  
+});
 
   client.on('error', function(err) {
     console.log('Error: %s', err.message);
