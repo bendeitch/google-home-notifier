@@ -1,7 +1,7 @@
 var config = require('config');
 var express = require('express');
-var googlehomefinder = require('google-home-notifier/google-home-finder');
-var googlehome = require('google-home-notifier');
+var googlehomefinder = require('./google-home-finder');
+var googlehome = require('./google-home-notifier');
 var bodyParser = require('body-parser');
 var app = express();
 
