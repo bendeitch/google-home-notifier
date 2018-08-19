@@ -1,5 +1,5 @@
 {
   "language": "en",
   "serverPort": 8091,
-  "devices": ["Kitchen Assistant", "Sitting Room Assistant", "Bedroom Assistant", "Dojo Assistant"]
+  "devices": ["Kitchen Assistant", "Sitting Room Assistant", "Master Bedroom Assistant", "Dojo Assistant", "Family Room Assistant"]
 }
