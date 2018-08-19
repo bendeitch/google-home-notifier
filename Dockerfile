@@ -21,5 +21,4 @@ RUN sed -i s/rst\.getaddrinfo\(/rst.getaddrinfo\({families:[4]}/ ./node_modules/
 # Bundle app source
 COPY . .
 
-EXPOSE 8080
 CMD service dbus start && service avahi-daemon start && npm start
