@@ -26,11 +26,6 @@ var getAddress = function(deviceName) {
 
 var processText = function(text, deviceAddresses) {
 
-  if (!deviceAddresses) {
-    console.log("NULL device address indicates named device not found")
-    return;
-  }
-  
   if (text.startsWith('http')) {
     var mp3_url = text;
     googlehome.play(mp3_url, deviceAddresses, function(notifyRes) {
@@ -62,7 +57,12 @@ var processRequest = function(req, res, deviceName) {
     try {
 
       if (deviceName) {
-        processText(text, getAddress(deviceName));
+        var deviceAddress = getAddress(deviceName);
+        if (deviceAddress) {
+          processText(text, getAddress(deviceName));
+        } else {
+          console.log("No address found for device '%s', suggest wait until device is discovered and try again.");
+        }
       } else {
         processText(text, getAllAddresses());
       }
