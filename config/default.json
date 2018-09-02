@@ -1,5 +1,6 @@
 {
-  "language": "en-GB",
+  "language": "en",
+  "accent": "uk",
   "serverPort": 8091,
   "devices": ["Kitchen Assistant", "Sitting Room Assistant", "Master Bedroom Assistant", "Dojo Assistant", "Family Room Assistant"]
 }

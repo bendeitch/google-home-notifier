@@ -4,12 +4,14 @@ var googletts = require('google-tts-api');
 var queue = require('queue');
 var lastMessageQueued = '';
 var q = queue({concurrency: 1, autostart: true});
+var ttsSpeed = 1;
+var ttsKeyTimeoutMs = 10000;
 
-var notify = function(message, hosts, language, callback) {
+var notify = function(message, hosts, language, accent, callback) {
 
   if (q.length == 0 || message != lastMessageQueued) {  
     q.push(function(finished) {
-      getSpeechUrl(message, hosts, language, function(res) {
+      getSpeechUrl(message, hosts, language, accent, function(res) {
         finished();
         callback(res);
       });
@@ -26,13 +28,15 @@ var play = function(mp3_url, hosts, callback) {
 };
 
 
-var getSpeechUrl = function(text, hosts, language, callback) {
-  googletts(text, language, 1).then(function (url) {
+var getSpeechUrl = function(text, hosts, language, accent, callback) {
+  googletts(text, language, ttsSpeed, ttsKeyTimeoutMs, accent).then(function (url) {
     hosts.forEach(function (host) {
-      onDeviceUp(host, url, function(res){
-        callback(res);
-      })
-    })
+	  if (host) {
+        onDeviceUp(host, url, function(res){
+          callback(res);
+	    });
+      }
+    });
   }).catch(function (err) {
     console.error(err.stack);
   });
@@ -40,9 +44,11 @@ var getSpeechUrl = function(text, hosts, language, callback) {
 
 var getPlayUrl = function(url, hosts, callback) {
   hosts.forEach(function(host) {
-    onDeviceUp(host, url, function(res){
-      callback(res)
-    });
+    if (host) {
+      onDeviceUp(host, url, function(res){
+        callback(res)
+      });
+	}
   });
 };
 

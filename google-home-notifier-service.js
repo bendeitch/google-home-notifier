@@ -6,10 +6,11 @@ var bodyParser = require('body-parser');
 var app = express();
 
 var language = config.get('language');
+var accent = config.get('accent');
 var serverPort = config.get('serverPort');
 var devices = config.get('devices');
 
-console.log('Configured with language "%s", serverPort %d, devices: %s', language, serverPort, devices);
+console.log('Configured with language "%s", accent "%s", serverPort %d, devices: %s', language, accent, serverPort, devices);
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -36,7 +37,7 @@ var processText = function(text, deviceAddresses) {
 
   } else {
 
-    googlehome.notify(text, deviceAddresses, language, function(notifyRes) {
+    googlehome.notify(text, deviceAddresses, language, accent, function(notifyRes) {
       if (notifyRes != 'OK') {
         console.log(notifyRes);
       }
@@ -57,12 +58,7 @@ var processRequest = function(req, res, deviceName) {
     try {
 
       if (deviceName) {
-        var deviceAddress = getAddress(deviceName);
-        if (deviceAddress) {
-          processText(text, getAddress(deviceName));
-        } else {
-          console.log("No address found for device '%s', suggest wait until device is discovered and try again.");
-        }
+        processText(text, getAddress(deviceName));
       } else {
         processText(text, getAllAddresses());
       }
