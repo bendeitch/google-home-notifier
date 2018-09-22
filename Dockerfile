@@ -11,7 +11,10 @@ COPY package*.json ./
 # Install avahi dev libs
 RUN apt-get update && apt-get install -y \
   avahi-daemon avahi-discover libnss-mdns libavahi-compat-libdnssd-dev
-  
+
+# Upgrade npm
+RUN npm i npm@latest -g
+
 # Build node_modules
 RUN npm install --only=production
 
